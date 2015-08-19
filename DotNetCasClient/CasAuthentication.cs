@@ -573,7 +573,7 @@ namespace DotNetCasClient
             HttpContext context = HttpContext.Current;
             HttpResponse response = context.Response;
 
-            response.Redirect(UrlUtil.ResolveUrl(CookiesRequiredUrl), false);
+            response.Redirect(UrlUtil.ResolveUrl(CookiesRequiredUrl) + "?url=" + HttpUtility.UrlEncode(context.Request.Path), false);
         }
 
         /// <summary>
@@ -586,7 +586,7 @@ namespace DotNetCasClient
             HttpContext context = HttpContext.Current;
             HttpResponse response = context.Response;
 
-            response.Redirect(UrlUtil.ResolveUrl(NotAuthorizedUrl), false);
+            response.Redirect(UrlUtil.ResolveUrl(NotAuthorizedUrl) + "?url=" + HttpUtility.UrlEncode(context.Request.Path), false);
         }
 
         /// <summary>
