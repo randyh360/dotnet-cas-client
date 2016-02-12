@@ -373,5 +373,45 @@ namespace DotNetCasClient.Utils
 
             return (contentTypeIsEligible && fileNameIsEligible);
         }        
+
+        /// <summary>
+        /// Detect if the current request is an async post back request from an UpdatePanel, etc.
+        /// <returns>Returns True if the request is an async post back, otherwise False</returns>
+        internal static bool IsAsyncPostBackRequest()
+        {
+            HttpContext context = HttpContext.Current;
+            HttpRequest request = context.Request;
+
+            string[] values = request.Headers.GetValues("X-MicrosoftAjax");
+            if (values != null)
+            {
+                for (int i = 0; i < values.Length; i++)
+                {
+                    if (values[i].IndexOf("Delta=true", StringComparison.OrdinalIgnoreCase) != -1)
+                        return true;
+                }
+            }
+
+            return (request.Form["__ASYNCPOST"] != null && request.Form["__ASYNCPOST"].Trim() == "true");
+        }
+
+        /// <summary>
+        /// Check if the current user principal has access to the requested resource.
+        /// </summary>
+        /// <returns>Returns True if the current user has access to the requested resource, otherwise False</returns>
+        internal static bool CheckUrlAccessForCurrentPrincipal()
+        {
+            HttpContext context = HttpContext.Current;
+            HttpRequest request = context.Request;
+            var user = context.User;
+
+            if (user == null)
+            {
+                var identity = new System.Security.Principal.GenericIdentity("", "");
+                user = new System.Security.Principal.GenericPrincipal(identity, new string[] { });
+            }
+
+            return System.Web.Security.UrlAuthorizationModule.CheckUrlAccessForPrincipal(request.Path, user, request.HttpMethod);
+        }
     }
 }

@@ -220,6 +220,11 @@ namespace DotNetCasClient
                     logger.Info("  Redirecting to CAS Login Page");
                     CasAuthentication.RedirectToLoginPage();
                 }
+                //Async post backs from UpdatePanels suppress the standard Forms Authentication redirect causing the above checks to fail. 
+                else if (RequestEvaluator.IsAsyncPostBackRequest() && !RequestEvaluator.CheckUrlAccessForCurrentPrincipal())
+                {
+                    context.Response.Redirect(UrlUtil.ConstructLoginRedirectUrl(false, CasAuthentication.Renew), false);
+                }
 
                 logger.Debug("Ending EndRequest for " + request.RawUrl);
             }
